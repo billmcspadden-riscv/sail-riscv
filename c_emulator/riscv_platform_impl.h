@@ -5,7 +5,12 @@
 
 /* Settings of the platform implementation. */
 
-#define DEFAULT_RSTVEC     0x00001000
+// #define DEFAULT_RSTVEC     0x00001000
+#define DEFAULT_RSTVEC     rv_cfg_c_int("/reset/address")
+
+extern char     *RV64ISA;
+extern char     *RV32ISA;
+extern char     *RV128ISA;
 
 extern bool rv_enable_pmp;
 extern bool rv_enable_zfinx;
@@ -21,6 +26,8 @@ extern int  rv_enable_Smepmp;
 extern int  rv_enable_Zicond;
 
 extern bool rv_enable_experimental_extensions;
+
+extern uint64_t rv_reset_address;
 
 extern uint64_t rv_ram_base;
 extern uint64_t rv_ram_size;

@@ -3,6 +3,10 @@
 #include <stdio.h>
 
 /* Settings of the platform implementation, with common defaults. */
+char     *RV64ISA                   = "";
+char     *RV32ISA                   = "";
+char     *RV128ISA                  = "";
+
 bool rv_enable_pmp                  = false;
 bool rv_enable_zfinx                = false;
 bool rv_enable_rvc                  = true;
@@ -18,6 +22,8 @@ int  rv_enable_Smepmp               = 0;
 int  rv_enable_Zicond               = 0;
 
 bool rv_enable_experimental_extensions = false;
+
+uint64_t rv_reset_address = UINT64_C(0x0);
 
 uint64_t rv_ram_base = UINT64_C(0x80000000);
 uint64_t rv_ram_size = UINT64_C(0x4000000);
