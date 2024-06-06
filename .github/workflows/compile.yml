@@ -12,20 +12,6 @@ jobs:
       uses: actions/checkout@HEAD
       with:
         submodules: recursive
-#    - name: Update submodule branch
-#      run : |
-#        echo $PWD ; \
-#        cat .gitmodules ; \
-#        git branch ; \
-#        git branch -r ; \
-#        cd TEST_DIR_ROOT/riscv_tests.git ; \
-#        echo $PWD ; \
-#        ls -l ;
-#        git remote add origin2 git@github.com:riscv-software-src/riscv-tests.git ; \
-#        git fetch --all
-#        git branch --all ; \
-#        git checkout -t origin2/riscv-tests-sail ; \
-#        ls -l ;
     - name: Ensure pre-commit checks pass
       run: pip install pre-commit && pre-commit run --all-files --show-diff-on-failure --color=always
     - name: Init opam
