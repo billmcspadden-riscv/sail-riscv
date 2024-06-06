@@ -66,7 +66,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: tests_new.xml
-        path: TEST_DIR_ROOT/riscv_test.git.subtree/tests_new.xml
+        path: TEST_DIR_ROOT/riscv_tests.git.subtree/tests_new.xml
     - name: Upload event payload
       if: always()
       uses: actions/upload-artifact@v4
