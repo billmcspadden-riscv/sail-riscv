@@ -49,7 +49,7 @@ following:
 all new test collateral will be put.
 1. Created a `bin/` directory under which various model scripts and executables
 are added.
-1. Installed https://github.com/riscv-software-src/riscv-tests as a submodule
+1. Installed https://github.com/riscv-software-src/riscv-tests as a subtree
 at `TEST_DIR_ROOT/riscv-tests.git/`.  We will be working on  a special branch
 in this repository: `riscv-tests-sail`.  This allows us to add tests onto our
 branch.  And we can incorporate new tests into our testsuite as they appear
