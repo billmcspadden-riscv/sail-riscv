@@ -89,4 +89,3 @@
 3.1 Run tests to make sure new updates from riscv-tests/master work as expected.
     Then commit the changes (if needed).
     Then generate a PR for these new changes
-
