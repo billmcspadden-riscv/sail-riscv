@@ -1,0 +1,94 @@
+2024-05-28  Bill McSpadden
+
+-.0 The following was done to create the subtree(s).  This was then committed to 
+    sail-riscv/<branch>
+
+    > git subtree add --prefix TEST_DIR_ROOT/riscv_tests.git.subtree     git@github.com:riscv-software-src/riscv-tests.git riscv-tests-sail    [--squash]
+
+# TODO: request sent to Andrew to be made contributor to the riscv-test-env repo
+#       DONE
+# TODO: the TEST_DIR_ROOT/riscv_tests.git.subtree/env exists when riscv-tests subtree 
+#       is added.  And this leads to the error, "prefix 'TEST_DIR_ROOT/riscv_tests.git.subtree/env' already exists."
+#       So, I need figure out something. The path to "env" is needed by riscv-tests
+#       build process, so this might have an impact on the riscv-tests build method.
+#       THE FIX: removed env/ on the branch, 'riscv-tests-sail'.  Then perform the
+#       following command:
+    > git subtree add --prefix TEST_DIR_ROOT/riscv_tests.git.subtree/env git@github.com:riscv/riscv-test-env.git           riscv-test-env-sail [--squash]
+
+## 
+# ... In the meantime, use the master branch
+    > git subtree add --prefix TEST_DIR_ROOT/riscv_tests.git.subtree/env git@github.com:riscv/riscv-test-env.git            master              [--squash]
+
+0. Check out the sail-riscv repo
+
+0.1  Point to remote
+    This will persist within your working repository.  But when you checkout
+    another repo,  you'll need to execute this command from within the new repo.
+    TODO:  is there a way to do this with git hooks?
+
+    > git remote add riscv-tests-sail-remote      git@github.com:riscv-software-src/riscv-tests.git
+    > git remote add riscv-tests-env-sail-remote  https://github.com/riscv/riscv-test-env.git
+
+
+1.0 Go to test directory.  Add new tests/files
+
+    > cd TEST_DIR_ROOT/riscv_tests.git.subtree
+    > autoconf
+    > ./configure --prefix $PWD/target
+    > make isa
+
+1.1 Make sure the new tests run against your model
+
+1.1.1  Individual test
+
+    > cd TEST_DIR_ROOT/riscv_tests.git.subtree
+    > ../../c_emulator/riscv_sim_RV[32|64] [options] isa/<elf_file>
+
+
+1.1.2  Suite of tests
+
+    > cd TEST_DIR_ROOT/riscv_tests.git.subtree
+    > ../../bin/run_tests.py --32bit=yes --64bit=yes --c_sim=yes --test_switch_pyfile=test_command_line_switch.py --test_ignore_pyfile=test_ignore_list.py
+
+
+2.0 Push your new tests/files back to the riscv-tests repository (branch: riscv-tests-sail)
+
+    > cd <sail-riscv-root>
+    > git subtree push --prefix TEST_DIR_ROOT/riscv_tests.git.subtree/ riscv-tests-sail-remote riscv-tests-sail
+
+    This should put your changes into the riscv-tests repo under the riscv-tests-sail branch.
+    Steer your browser to ...
+
+        https://github.com/riscv-software-src/riscv-tests/tree/riscv-tests-sail
+
+    ... and make sure your files were properly committed to the branch.
+
+    MAKE SURE YOUR CHANGES DID NOT GO ONTO 'master'.  If they did,  back out your last push.
+
+2.1 If you made any changes to TEST_DIR_ROOT/riscv_tests.git.subtree/env/, commit them and push
+    to the remote repo.
+
+
+
+3.0  Merging from remote riscv-tests/master into local repo
+
+    Note :  When I did the following command ...
+
+        > git subtree pull -P TEST_DIR_ROOT/riscv_tests.git.subtree/ riscv-tests-sail-remote master
+
+    ... I got the new code , but git assumed that I was going to commit
+    these changes and it opened a commit editor saying it was merging with
+    the following message: 
+
+        Merge commit '408e461da11e0b298c4b69e587729532787212f5' into new_test_3
+
+    I tried to 'q!' out of my vim editor (assuming that the commit would not
+    be made),  but the commit was made with the default commit message.
+
+    The commit was made onto the sail-riscv branch,  NOT onto the riscv-tests 
+    branch.
+
+3.1 Run tests to make sure new updates from riscv-tests/master work as expected.
+    Then commit the changes (if needed).
+    Then generate a PR for these new changes
+
