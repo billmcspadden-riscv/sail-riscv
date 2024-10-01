@@ -1,13 +1,13 @@
 2024-05-28  Bill McSpadden
 
--.0 The following was done to create the subtree(s).  This was then committed to 
+-.0 The following was done to create the subtree(s).  This was then committed to
     sail-riscv/<branch>
 
     > git subtree add --prefix TEST_DIR_ROOT/riscv_tests.git.subtree     git@github.com:riscv-software-src/riscv-tests.git riscv-tests-sail    [--squash]
 
 # TODO: request sent to Andrew to be made contributor to the riscv-test-env repo
 #       DONE
-# TODO: the TEST_DIR_ROOT/riscv_tests.git.subtree/env exists when riscv-tests subtree 
+# TODO: the TEST_DIR_ROOT/riscv_tests.git.subtree/env exists when riscv-tests subtree
 #       is added.  And this leads to the error, "prefix 'TEST_DIR_ROOT/riscv_tests.git.subtree/env' already exists."
 #       So, I need figure out something. The path to "env" is needed by riscv-tests
 #       build process, so this might have an impact on the riscv-tests build method.
@@ -15,7 +15,7 @@
 #       following command:
     > git subtree add --prefix TEST_DIR_ROOT/riscv_tests.git.subtree/env git@github.com:riscv/riscv-test-env.git           riscv-test-env-sail [--squash]
 
-## 
+##
 # ... In the meantime, use the master branch
     > git subtree add --prefix TEST_DIR_ROOT/riscv_tests.git.subtree/env git@github.com:riscv/riscv-test-env.git            master              [--squash]
 
@@ -68,8 +68,6 @@
 2.1 If you made any changes to TEST_DIR_ROOT/riscv_tests.git.subtree/env/, commit them and push
     to the remote repo.
 
-
-
 3.0  Merging from remote riscv-tests/master into local repo
 
     Note :  When I did the following command ...
@@ -78,14 +76,14 @@
 
     ... I got the new code , but git assumed that I was going to commit
     these changes and it opened a commit editor saying it was merging with
-    the following message: 
+    the following message:
 
         Merge commit '408e461da11e0b298c4b69e587729532787212f5' into new_test_3
 
     I tried to 'q!' out of my vim editor (assuming that the commit would not
     be made),  but the commit was made with the default commit message.
 
-    The commit was made onto the sail-riscv branch,  NOT onto the riscv-tests 
+    The commit was made onto the sail-riscv branch,  NOT onto the riscv-tests
     branch.
 
 3.1 Run tests to make sure new updates from riscv-tests/master work as expected.
