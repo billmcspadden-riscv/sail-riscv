@@ -68,7 +68,6 @@ opts, args = getopt.getopt (
     "32bit=",
     "64bit=",
     "c_sim=",
-    "ocaml_sim=",
     "sailcov=",
     "clean_build=",
     "test_dir=",
@@ -83,7 +82,6 @@ xml_outfile         = "./tests.xml"
 run_32bit_tests     = True
 run_64bit_tests     = True
 run_csim            = True
-run_ocamlsim        = False
 sailcov             = False
 clean_build         = True
 test_dir_list       = [ "isa", "riscv-tests" ]
@@ -159,7 +157,7 @@ def print_usage(invocation) :
     print("    The script looks into test_dir, finds all of the elf files and then runs the simulator")
     print("    with each elf file.")
     print("")
-    print("    Output logs are put into [dir]/<testname>.cout (for C sim) or [dir/]<testname>.out (for ocaml sim).")
+    print("    Output logs are put into [dir]/<testname>.cout (for C sim).")
     print("")
     print("    Some tests require specific command line switches to properly run.  To add these")
     print("    command line switches,  you must use the '--test_switch_pyfile=<file>' switch.")
@@ -170,11 +168,10 @@ def print_usage(invocation) :
     print("    --32bit=[yes|y|no|n]            run 32-bit tests. default: yes")
     print("    --64bit=[yes|y|no|n]            run 64-bit tests. default: yes")
     print("    --c_sim=[yes|y|no|n]            run the C simulator. default: yes")
-    print("    --ocaml_sim=[yes|y|no|n]        run the Ocaml simulator. default: no")
     print("    --sailcov=[yes|y|no|n]          compile and run to get Sail model coverage. default: no.  ")
     print("                                    NOTE: sets 'clean_build' to yes. Coverage is gathered seperately for ")
     print("                                    32 and 64 bit models")
-    print("    --clean_build=[yes|y|no|n]      do a 'make clean' before running 32/64/c_sim/ocaml_sim set of tests. default: yes")
+    print("    --clean_build=[yes|y|no|n]      do a 'make clean' before running 32/64/c_sim set of tests. default: yes")
     print("    --test_dir=<dir>                directory where test elf files live. default:  ./isa ./riscv-tests")
     print("    --test_switch_pyfile=<file.py>  a python fragment file that allows the user to pass in command line switches to the")
     print("                                    riscv_sim command on a per-test basis.  The format of the file should be:")
@@ -195,7 +192,6 @@ def process_command_line_args(opts) :
     global run_32bit_tests
     global run_64bit_tests
     global run_csim
-    global run_ocamlsim
     global sailcov
     global clean_build
     global test_dir_list
@@ -230,13 +226,6 @@ def process_command_line_args(opts) :
                 run_csim = False
             else :
                 fatal_print("invalid argument to '--run_csim' switch: " + arg)
-        elif opt in ('--ocaml_sim') :
-            if arg in ('yes', 'y') :
-                run_ocamlsim = True
-            elif arg in ('no', 'n') :
-                run_ocamlsim = False
-            else :
-                fatal_print("invalid argument to '--run_ocamlsim' switch: " + arg)
         elif opt in ('--sailcov') :
             if arg in ('yes', 'y') :
                 sailcov = True
@@ -251,7 +240,7 @@ def process_command_line_args(opts) :
             elif arg in ('no', 'n') :
                 clean_build = False
             else :
-                fatal_print("invalid argument to '--run_ocamlsim' switch: " + arg)
+                fatal_print("invalid argument to '--clean_build' switch: " + arg)
                 sys.exit(1)
         elif opt in ('--test_dir') :
             if not os.path.exists(arg) :
@@ -279,7 +268,6 @@ def print_optional_settings() :
     global run_32bit_tests
     global run_64bit_tests
     global run_csim
-    global run_ocamlsim
     global sailcov
     global clean_build
     global test_dir_list
@@ -294,7 +282,6 @@ def print_optional_settings() :
     print('    {:32}'.format('run_32bit_tests: ')               + str(run_32bit_tests))
     print('    {:32}'.format('run_64bit_tests: ')               + str(run_64bit_tests))
     print('    {:32}'.format('run_csim: ')                      + str(run_csim))
-    print('    {:32}'.format('run_ocamlsim: ')                  + str(run_ocamlsim))
     print('    {:32}'.format('sailcov: ')                       + str(sailcov))
     print('    {:32}'.format('clean_build: ')                   + str(clean_build))
     print('    {:32}'.format('test_dir_list: ')                 + str(test_dir_list))
@@ -499,53 +486,6 @@ if clean_build :
 else :
     pass
 
-if run_ocamlsim :
-    if run_32bit_tests :
-        print("Building 32-bit RISCV specification...")
-        cmd = "make ARCH=RV32 ocaml_emulator/riscv_ocaml_sim_RV32"
-        ret_val = os.system(cmd)
-        if ret_val == 0 :
-            green("Building 32-bit RISCV OCaml emulator", "ok")
-        else :
-            debug_print("non-zero exit value from command: '" + cmd + "'")
-            red("Building 32-bit RISCV OCaml emulator","fail")
-
-if run_32bit_tests and run_ocamlsim :
-    for test in glob.glob(DIR + '/' + TESTDIR + '/' + "*") :
-        debug_print("test: " + test)
-        if not is_riscv_elf_32(test) :
-            continue
-        if ignore_test(test) :
-            debug_print("ignoring test: " + test)
-            continue
-        # skip F/D tests on OCaml for now
-        pat = re.compile('(rv32ud)')
-        mo = pat.search(test)
-        if mo != None :
-            continue
-        pat = re.compile('(rv32uf)')
-        mo = pat.search(test)
-        if mo != None :
-            continue
-        outfile = test + ".out"
-        sim_switch = ""
-        for key in sim_test_command_line_switch :
-            pat = re.compile(key)
-            mo = pat.search(test)
-            if mo != None:
-                sim_switch = sim_test_command_line_switch[key]
-                break
-        cmd = "timeout 5 " + RISCVDIR + "/ocaml_emulator/riscv_ocaml_sim_RV32" + " " + sim_switch + " " + test + " > " + outfile + " 2>&1 && grep -q SUCCESS " + outfile
-        ret_val = os.system(cmd)
-        if ret_val == 0 :
-           green("OCaml-32 " + os.path.basename(test), "ok")
-        else :
-           red("OCaml-32 " + os.path.basename(test),  "fail")
-else :
-    pass
-
-finish_suite("32-bit RISCV OCaml-simulator tests")
-
 if clean_build :
     cmd = "make ARCH=RV32 clean"
     ret_val = os.system(cmd)
@@ -613,52 +553,6 @@ else :
     pass
 
 print("Building 64-bit RISCV specification...")
-if run_ocamlsim :
-    if run_64-bit_tests :
-        cmd = "make ARCH=RV64 ocaml_emulator/riscv_ocaml_sim_RV64"
-        ret_val = os.system(cmd)
-        if ret_val == 0 :
-            green("Building 64-bit RISCV OCaml emulator", "ok")
-        else :
-            error_print("non-zero exit value from command: '" + cmd + "'")
-            red("Building 64-bit RISCV OCaml emulator","fail")
-
-if run_64bit_tests and run_ocamlsim :
-    for test in glob.glob(DIR + '/' + TESTDIR + '/' + "*") :
-        debug_print("test: " + test)
-        if not is_riscv_elf_64(test) :
-            continue
-        if ignore_test(test) :
-            debug_print("ignoring test: " + test)
-            continue
-        # skip F/D tests on OCaml for now
-        pat = re.compile('(rv64ud)')
-        mo = pat.search(test)
-        if mo != None :
-            continue
-        pat = re.compile('(rv64uf)')
-        mo = pat.search(test)
-        if mo != None :
-            continue
-        outfile = test + ".out"
-        sim_switch = ""
-        for key in sim_test_command_line_switch :
-            pat = re.compile(key)
-            mo = pat.search(test)
-            if mo != None:
-                sim_switch = sim_test_command_line_switch[key]
-                break
-        cmd = "timeout 5 " + RISCVDIR + "/ocaml_emulator/riscv_ocaml_sim_RV64" + " " + sim_switch + " " + test + " > " + outfile + " 2>&1 && grep -q SUCCESS " + outfile
-        ret_val = os.system(cmd)
-        if ret_val == 0 :
-           green("OCaml-64 " + os.path.basename(test), "ok")
-        else :
-           red("OCaml-64 " + os.path.basename(test),  "fail")
-else :
-    pass
-
-finish_suite("64-bit RISCV OCaml-simulator tests")
-
 
 if clean_build :
     cmd = "make ARCH=RV64 clean"
