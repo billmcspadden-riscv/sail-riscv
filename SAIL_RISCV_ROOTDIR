@@ -1,0 +1,5 @@
+This file is created in the root directory for the RISC-V Sail model.
+It is used as a reference point for various tools within the repo.
+
+Do not rename it.  Do not move it.  Do not duplicate it anywhere in
+the repo,  else tooling may get confused.
