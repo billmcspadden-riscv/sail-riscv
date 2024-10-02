@@ -40,7 +40,7 @@ jobs:
       run: |
         eval $(opam env) ; \
         cd TEST_DIR_ROOT/riscv_tests.git.subtree ; \
-        ../../bin/run_tests.py --outfile=tests_new.xml --32bit=yes --64bit=yes --c_sim=yes --ocaml_sim=no --sailcov=no --clean_build=yes --test_switch_pyfile=test_command_line_switch.py --test_ignore_pyfile=test_ignore_list.py
+        ../../bin/run_tests.py --outfile=tests_new.xml --32bit=yes --64bit=yes --c_sim=yes --sailcov=no --clean_build=yes --test_switch_pyfile=test_command_line_switch.py --test_ignore_pyfile=test_ignore_list.py
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v3
