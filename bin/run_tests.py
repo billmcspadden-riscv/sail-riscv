@@ -55,8 +55,7 @@ from copy import deepcopy
 # Data structure for sim command line arguments
 # TODO:  make the key a regex
 sim_test_command_line_switch_dict = { }
-sim_test_command_line_switch_dict = { }
-sim_test_command_line_switch      = { }
+sim_test_command_line_switch = { }
 my_ignore_test_tuple = []
 
 # Allowed command line options
