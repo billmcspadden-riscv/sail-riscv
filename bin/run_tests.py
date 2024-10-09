@@ -37,6 +37,7 @@ import os               # needed for os command interactions
 import glob             # needed for file list gathering useing wildcards
 import re               # regular expression
 import sys              # needed for command line arguments
+import signal           # needed for signal handling (cntl-C especially)
 import getopt           # needed for command line arguments
 import collections      # needed for dequeues
 import subprocess       # needed for subprocesses where stdout is needed
@@ -54,6 +55,8 @@ from copy import deepcopy
 # Data structure for sim command line arguments
 # TODO:  make the key a regex
 sim_test_command_line_switch_dict = { }
+sim_test_command_line_switch_dict = { }
+sim_test_command_line_switch      = { }
 my_ignore_test_tuple = []
 
 # Allowed command line options
@@ -147,6 +150,25 @@ def TRACE(text = "") :
     print("TRACE: file: " + filename + " line: " + str(of.f_lineno) + " : " + text)
     return
 #  Print Levels:
+# ====================================
+
+# ====================================
+# Subprocess support functions
+def subproc(cmd) :
+    try:
+        debug_print("subproc: cmd: " + cmd)
+#        ret = os.system(cmd)
+        subprocess.check_call(cmd, shell = True)
+    except KeyboardInterrupt as e:
+        debug_print("interrupted: subproc: cmd: " + cmd)
+        sys.exit(1)
+    except:
+        debug_print("subproc: cmd: " + cmd)
+        return 1
+    else: 
+        return 0
+       
+# Subprocess support functions
 # ====================================
 
 # ====================================
@@ -402,17 +424,24 @@ def ignore_test(testname) :
 #  Functions for determining file types
 # ====================================
 
+def signal_handler(sig, frame):
+    degug_print("entering signal_handler() for signal ", sig)
+    sys.exit(1)
+    
+
 # Function prototypes
 # ===========================================================================79
 
 # ===========================================================================79
 # Start of execution....
 
+process_command_line_args(opts)
+#signal.signal(signal.SIGINT, signal_handler)
+
 debug_print("starting...")
 debug_print("abspath to this script: " + os.path.abspath(sys.argv[0]))
 debug_print("opts: " + str(opts))
 
-process_command_line_args(opts)
 
 # ====================================
 # Implicit overrides of program varaibles
@@ -478,7 +507,8 @@ debug_print("DIR + '/' + TESTDIR + '/' + * :" + DIR + '/' + TESTDIR + '/' + "*")
 
 if clean_build :
     cmd = "make ARCH=RV32 clean"
-    ret_val = os.system(cmd)
+    ret_val = subproc(cmd)
+#    ret_val = os.system(cmd)
     if ret_val != 0 :
         fatal_print("non-zero exit value from command: '" + cmd + "'")
     else :
@@ -488,7 +518,8 @@ else :
 
 if clean_build :
     cmd = "make ARCH=RV32 clean"
-    ret_val = os.system(cmd)
+    ret_val = subproc(cmd)
+#    ret_val = os.system(cmd)
     if ret_val != 0 :
         fatal_print("non-zero exit value from command: '" + cmd + "'")
         sys.exit(1)
@@ -502,7 +533,8 @@ print("Building 32-bit RISCV specification...")
 if run_csim :
     if run_32bit_tests :
         cmd = "make ARCH=RV32 " + MAKE_SAILCOV + " c_emulator/riscv_sim_RV32"
-        ret_val = os.system(cmd)
+        ret_val = subproc(cmd)
+#        ret_val = os.system(cmd)
         if ret_val == 0 :
             green("Building 32-bit RISCV C emulator", "ok")
         else :
@@ -532,7 +564,8 @@ if run_32bit_tests and run_csim :
 
         cmd = "timeout 5 " + RISCVDIR + "/c_emulator/riscv_sim_RV32" + run_sailcov + " " + sim_switch + " " + test + " > " + outfile + " 2>&1 && grep -q SUCCESS " + outfile
         debug_print("cmd: '" + cmd + "'")
-        ret_val = os.system(cmd)
+        ret_val = subproc(cmd)
+#        ret_val = os.system(cmd)
         if ret_val == 0 :
            green("C-32 " + os.path.basename(test), "ok")
         else :
@@ -544,7 +577,8 @@ finish_suite("32-bit RISCV C-simulator tests")
 
 if clean_build :
     cmd = "make ARCH=RV64 clean"
-    ret_val = os.system(cmd)
+    ret_val = subproc(cmd)
+#    ret_val = os.system(cmd)
     if ret_val != 0 :
         fatal_print("non-zero exit value from command: '" + cmd + "'")
     else :
@@ -556,7 +590,8 @@ print("Building 64-bit RISCV specification...")
 
 if clean_build :
     cmd = "make ARCH=RV64 clean"
-    ret_val = os.system(cmd)
+    ret_val = subproc(cmd)
+#    ret_val = os.system(cmd)
     if ret_val != 0 :
         fatal_print("non-zero exit value from command: '" + cmd + "'")
     else :
@@ -568,7 +603,8 @@ print("Building 64-bit RISCV specification...")
 if run_csim :
     if run_64bit_tests :
         cmd = "make ARCH=RV64 " + MAKE_SAILCOV + " c_emulator/riscv_sim_RV64"
-        ret_val = os.system(cmd)
+        ret_val = subproc(cmd)
+#        ret_val = os.system(cmd)
         if ret_val == 0 :
             green("Building 64-bit RISCV C emulator", "ok")
         else :
@@ -598,7 +634,8 @@ if run_64bit_tests and run_csim :
             run_sailcov = ""
 
         cmd = "timeout 5 " + RISCVDIR + "/c_emulator/riscv_sim_RV64" + run_sailcov + " " + sim_switch + " " + test + " > " + outfile + " 2>&1 && grep -q SUCCESS " + outfile
-        ret_val = os.system(cmd)
+        ret_val = subproc(cmd)
+#        ret_val = os.system(cmd)
         if ret_val == 0 :
            green("C-64 " + os.path.basename(test), "ok")
         else :
