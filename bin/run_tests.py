@@ -165,7 +165,6 @@ def subproc(cmd) :
         return 1
     else:
         return 0
-       
 # Subprocess support functions
 # ====================================
 
