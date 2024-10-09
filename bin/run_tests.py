@@ -157,7 +157,6 @@ def TRACE(text = "") :
 def subproc(cmd) :
     try:
         debug_print("subproc: cmd: " + cmd)
-#        ret = os.system(cmd)
         subprocess.check_call(cmd, shell = True)
     except KeyboardInterrupt as e:
         debug_print("interrupted: subproc: cmd: " + cmd)
@@ -165,7 +164,7 @@ def subproc(cmd) :
     except:
         debug_print("subproc: cmd: " + cmd)
         return 1
-    else: 
+    else:
         return 0
        
 # Subprocess support functions
@@ -427,7 +426,6 @@ def ignore_test(testname) :
 def signal_handler(sig, frame):
     degug_print("entering signal_handler() for signal ", sig)
     sys.exit(1)
-    
 
 # Function prototypes
 # ===========================================================================79
@@ -436,12 +434,10 @@ def signal_handler(sig, frame):
 # Start of execution....
 
 process_command_line_args(opts)
-#signal.signal(signal.SIGINT, signal_handler)
 
 debug_print("starting...")
 debug_print("abspath to this script: " + os.path.abspath(sys.argv[0]))
 debug_print("opts: " + str(opts))
-
 
 # ====================================
 # Implicit overrides of program varaibles
@@ -527,7 +523,6 @@ if clean_build :
         pass
 else :
     pass
-
 
 print("Building 32-bit RISCV specification...")
 if run_csim :
