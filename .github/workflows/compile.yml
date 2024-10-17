@@ -22,19 +22,19 @@ jobs:
       run: test/run_tests.sh
     - name: Upload test results
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: tests.xml
         path: test/tests.xml
     - name: Upload test results (new)
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: tests_new.xml
         path: TEST_DIR_ROOT/riscv_tests.git.subtree/tests_new.xml
     - name: Upload event payload
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: event.json
         path: ${{ github.event_path }}
